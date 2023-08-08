@@ -16,14 +16,19 @@ CORS(app, resources={r"/api/v1/*": {"origins": "*"}})
 auth = None
 
 
-if getenv("AUTH_TYPE") == "auth":
+auth_type = getenv("AUTH_TYPE", auth)
+if auth_type == "auth":
     auth = Auth()
 
 
 def before_request():
     """before_request handler
     """
-    auth_list = ['/api/v1/status/', '/api/v1/unauthorized/', '/api/v1/forbidden/']
+    auth_list = [
+            '/api/v1/status/',
+            '/api/v1/unauthorized/',
+            '/api/v1/forbidden/']
+
     if auth and auth.require_auth(request.path, auth_list):
         if not auth.authorization_header(request):
             abort(401)
