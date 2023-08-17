@@ -58,3 +58,16 @@ class DB:
             return session.query(User).filter_by(**kwargs).one()
         except NoResultFound:
             raise NoResultFound
+
+    def update_user(self, user_id: int, **kwargs) -> None:
+        """locate the user to update, then will update the user’s attributes as
+        passed in the method arguments then commit changes to the database"""
+        user = self.find_user_by(id=user_id)
+        for key, value in kwargs.items():
+            if hasattr(user, key):
+                setattr(user, key, value)
+            else:
+                raise ValueError
+        session = self._session
+        session.add(user)
+        session.commit()
