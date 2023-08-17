@@ -2,6 +2,7 @@
 """Defines a _hash_password method that takes in a password string arguments
 """
 import bcrypt
+from sqlalchemy.orm.exc import NoResultFound
 
 from db import DB
 from user import User
@@ -29,16 +30,11 @@ class Auth:
     def register_user(self, email: str, password: str) -> User:
         """registers user in the database
         """
-        db = self._db._session
-        old_user = db.query(User).filter_by(email=email).first()
+        db = self._db
 
-        if old_user:
+        try:
+            db.find_user_by(email=email)
             raise ValueError(f'{email} already exists')
-
-        hashed_pwd = _hash_password(password)
-
-        user = User(email=email, hashed_password=hashed_pwd)
-        db.add(user)
-        db.commit()
-
-        return user
+        except NoResultFound:
+            hashed_pwd = _hash_password(password)
+            return db.add_user(email, hashed_pwd)
