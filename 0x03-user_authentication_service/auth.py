@@ -2,6 +2,7 @@
 """Defines a _hash_password method that takes in a password string arguments
 """
 import bcrypt
+import uuid
 from sqlalchemy.orm.exc import NoResultFound
 
 from db import DB
@@ -26,6 +27,11 @@ class Auth:
     def __init__(self):
         """initializes the authentication db"""
         self._db = DB()
+
+    def _generate_uuid(self) -> str:
+        """return a string representation of a new UUID
+        """
+        return str(uuid.uuid4())
 
     def register_user(self, email: str, password: str) -> User:
         """registers user in the database
