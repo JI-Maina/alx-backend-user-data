@@ -55,6 +55,6 @@ class DB:
             raise InvalidRequestError
         session = self._session
         try:
-            return session.query(User).filter(**kwargs).one()
-        except Exception:
+            return session.query(User).filter_by(**kwargs).one()
+        except NoResultFound:
             raise NoResultFound
