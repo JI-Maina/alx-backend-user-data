@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Sets a basic Flask app
 """
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, abort, make_response
 
 from auth import Auth
 
@@ -34,6 +34,27 @@ def users():
         return jsonify({"email": f'{email}', "message": "user created"})
     except ValueError:
         return jsonify({"message": "email already registered"}), 400
+
+
+@app.route('/sessions', methods=['POST'], strict_slashes=False)
+def login():
+    """POST /sessions
+    Return:
+      - 401 HTTP status If the login information is incorrect
+      - otherwise success message
+    """
+    email = request.form.get('email')
+    password = request.form.get('password')
+
+    if not AUTH.valid_login(email, password):
+        abort(401)
+
+    session_id = AUTH.create_session(email)
+
+    response = make_response('Successfully logged in')
+    response.set_cookie('session_id', session_id)
+
+    return jsonify({"email": f"{email}", "message": "logged in"})
 
 
 if __name__ == "__main__":
