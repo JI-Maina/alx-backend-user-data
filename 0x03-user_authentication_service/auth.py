@@ -78,8 +78,7 @@ class Auth:
         """
         db = self._db
         if session_id:
-            user = find_user_by(session_id=session_id)
-
+            user = db.find_user_by(session_id=session_id)
             if user:
                 return user
         return None
